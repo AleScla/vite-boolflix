@@ -3,5 +3,6 @@ import {reactive} from 'vue';
 export const store = reactive ({
     inputValue: "",
     allFilms:[],
-    allSeries:[]
+    allSeries:[],
+    posterPath: 'https://image.tmdb.org/t/p/w342'
 })
