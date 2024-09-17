@@ -2,6 +2,7 @@
 
 import {store} from './store.js';
 import AppHeader from './components/AppHeader.vue';
+import AppSingleCard from './components/AppSingleCard.vue';
 import axios from 'axios';
 
 
@@ -13,7 +14,8 @@ export default {
   },
   // 2) Dichiarazione del componente
   components: {
-    AppHeader
+    AppHeader,
+    AppSingleCard,
   },
   methods: {
     // funzione generale per la stampa dell'api dopo aver preso un valore dall'input
@@ -42,21 +44,6 @@ export default {
     inputClear(){
       store.inputValue = ''
     },
-    // stampa per le bandiere
-    flagPrinter(lang){
-      const flags = {
-        en: 'GB',
-        it: 'IT',
-        ja: 'JP',
-        fr: 'FR',
-      }
-      if(lang in flags){
-        return 'https://flagsapi.com/' + flags[lang] + '/flat/64.png';
-      }
-      else{
-        return 'https://www.novalibandiere.it/wp-content/uploads/jolly-roger_rackham.jpg';
-      }
-    },
   }
 }
 </script>
@@ -67,52 +54,43 @@ export default {
     <AppHeader />
     
     <main class="w-100">
-      <form @submit.prevent="StartAPI()" >
-        <input type="text" v-model="this.store.inputValue">
-        <button type="submit">
-          INVIA
-        </button>
-          
-        
-      </form>
-      <h2>FILMS</h2>
-      <ul v-for="(film, i) in store.allFilms" :key="i">
-            <li class="poster">
-              <img v-if="film.poster_path != null" class="poster" :src="store.posterPath + film.poster_path">
-              <p v-else><strong>COPERTINA NON DISPONIBILE</strong></p>
-            </li>
-            <li class="title w-100">Titolo: {{ film.title }}</li>
-            <li class="original-title">Titolo originale: {{ film.original_title }}</li>
-            <li class="language">Lingua originale: <img class="flags" :src="flagPrinter(film.original_language)"></li>
-            <li class="rating">Voto: 
-              <template v-for="n in Math.ceil((film.vote_average) / 2)">
-                <i class="fa-solid fa-star"></i>
-              </template>
-              <template v-for="n in (5 - Math.ceil((film.vote_average) / 2))">
-                <i class="fa-regular fa-star"></i>
-              </template>  
-            </li>
-            <hr>
-      </ul>
-      <h2>SERIES</h2>
-      <ul v-for="(series, i) in store.allSeries" :key="i">
-            <li class="poster">
-              <img v-if="series.poster_path != null" class="poster" :src="store.posterPath + series.poster_path">
-              <p v-else><strong>COPERTINA NON DISPONIBILE</strong></p>
-            </li>
-            <li class="title w-100">Titolo: {{ series.name }}</li>
-            <li class="original-title">Titolo originale: {{ series.original_name }}</li>
-            <li class="language">Lingua originale: <img class="flags" :src="flagPrinter(series.original_language)"></li>
-            <li class="rating">Voto: 
-              <template v-for="n in Math.ceil((series.vote_average) / 2)">
-                <i class="fa-solid fa-star"></i>
-              </template>
-              <template v-for="n in (5 - Math.ceil((series.vote_average) / 2))">
-                <i class="fa-regular fa-star"></i>
-              </template>  
-            </li>
-            <hr>  
-      </ul>
+      <div class="container">
+        <form class="w-100 py-5 search-form d-flex justify-content-center" @submit.prevent="StartAPI()">
+          <div class="form-floating text-center w-75">
+            <input type="text" v-model="this.store.inputValue" class="form-control" id="floatingInput" placeholder="Che film o serie cerchi?">
+            <label for="floatingInput">Che film cerchi?</label>
+          </div>
+          <button type="submit" class="ms-2 btn btn-danger "><strong>Cerca</strong></button>
+        </form>
+      </div>
+      <div class="container">
+        <h2 class="text-start text-white text-bold">FILMS</h2>
+        <div class="row">
+          <AppSingleCard v-for="film, index in store.allFilms" 
+          :key="index"
+          :poster="film.poster_path" 
+          :title="film.title" 
+          :OGtitle="film.original_title"
+          :rating="film.vote_average"
+          :language="film.original_language"
+          :overview="film.overview"
+          />
+        </div>
+      </div>
+      <div class="container">
+        <h2 class="text-start text-white text-bold">SERIE TV</h2>
+        <div class="row">
+          <AppSingleCard v-for="series, index in store.allSeries" 
+          :key="index"
+          :poster="series.poster_path" 
+          :title="series.title" 
+          :OGtitle="series.original_title"
+          :rating="series.vote_average"
+          :language="series.original_language"
+          :overview="series.overview"
+          />
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -121,7 +99,8 @@ export default {
 @use 'assets/scss/main' as *;
 // Import all of Bootstrap's CSS
 @import "bootstrap/scss/bootstrap";
-.flags{
-  width:60px;
+main{
+  background-color:#000000;
+  min-height:100vh;
 }
 </style>
